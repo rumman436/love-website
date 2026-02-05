@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Surprise for Wareesha</title>
+<title>Love Website</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body {
@@ -78,7 +78,8 @@ button {
   <button id="nextBtn" onclick="nextMessage()">Next</button>
 </div>
 
-<audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
+<!-- Background music from your GitHub URL -->
+<audio id="music" src="https://github.com/rumman436/love-website/blob/main/ScreenRecording_02-05-2026%2014-10-55_1.mp4?raw=true" loop></audio>
 
 <script>
 // -------------------- INTRO MESSAGES --------------------
@@ -117,7 +118,6 @@ function nextMessage() {
   if(stepIndex < introMessages.length){
     typeMessage(introMessages[stepIndex], () => {
       stepIndex++;
-      // hide Next button if intro finished
       if(stepIndex >= introMessages.length){
         document.getElementById("nextBtn").style.display = "none";
         showMainGame();
@@ -163,6 +163,7 @@ function scaredNo() {
 
 // -------------------- YES BUTTON --------------------
 function yesClick() {
+  document.getElementById("music").play(); // play song
   if(firstYesClick) {
     firstYesClick = false;
     if(confirm("ARE YOU SURE?")) {
@@ -175,8 +176,6 @@ function yesClick() {
 
 // -------------------- SHOW LOVE --------------------
 function showLove() {
-  document.getElementById("music").play();
-
   const content = document.getElementById("content");
   content.innerHTML = `
     <h1 class="love">I knew it 🥰❤️</h1>
