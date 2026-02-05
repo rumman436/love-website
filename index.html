@@ -81,8 +81,8 @@ button {
 <audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
 
 <script>
-// Step by step messages
-const messages = [
+// Intro messages sequence
+const introMessages = [
   "Heyy",
   "I need to ask you a really important question",
   "But are you really Wareesha?",
@@ -92,22 +92,22 @@ const messages = [
   "Just kidding"
 ];
 
-let currentStep = 0;
+let stepIndex = 0;
 
 function nextMessage() {
   const messageEl = document.getElementById("message");
-  currentStep++;
+  stepIndex++;
 
-  if(currentStep < messages.length){
-    messageEl.textContent = messages[currentStep];
+  if(stepIndex < introMessages.length){
+    messageEl.textContent = introMessages[stepIndex];
   } else {
-    // All messages done → show main game
+    // All intro messages done → show main game
     showMainGame();
   }
 }
 
 // Initialize first message
-document.getElementById("message").textContent = messages[0];
+document.getElementById("message").textContent = introMessages[0];
 
 // MAIN GAME FUNCTIONS
 function showMainGame() {
@@ -150,7 +150,6 @@ function yesClick() {
 }
 
 function showLove() {
-  // Play music
   document.getElementById("music").play();
 
   const content = document.getElementById("content");
