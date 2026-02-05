@@ -14,6 +14,7 @@ body {
   background: linear-gradient(135deg, #ff9a9e, #fad0c4);
   font-family: Arial, sans-serif;
   overflow: hidden;
+  transition: background 3s ease;
 }
 
 .container {
@@ -34,7 +35,12 @@ button {
   border-radius: 8px;
   cursor: pointer;
   margin-top: 20px;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.3s;
+}
+
+/* Button glow effect */
+button:hover {
+  box-shadow: 0 0 20px 5px rgba(255,77,109,0.7);
 }
 
 #yes {
@@ -53,21 +59,17 @@ button {
   color: #ff4d6d;
 }
 
-/* Confetti / hearts */
-.confetti-piece {
+/* Falling hearts */
+.heart {
   position: absolute;
-  width: 10px;
-  height: 10px;
-  background-color: #ff4d6d;
-  opacity: 0.8;
-  z-index: 1;
+  font-size: 20px;
   animation: fall 3s linear forwards;
-  border-radius: 50%;
+  z-index: 1;
 }
 
 @keyframes fall {
-  0% {transform: translateY(0) rotate(0deg);}
-  100% {transform: translateY(800px) rotate(360deg);}
+  0% { transform: translateY(0) rotate(0deg) scale(1);}
+  100% { transform: translateY(800px) rotate(360deg) scale(1.5);}
 }
 </style>
 </head>
@@ -75,10 +77,10 @@ button {
 
 <div class="container" id="content">
   <h1 id="message"></h1>
-  <button id="nextBtn" onclick="nextMessage()">Next</button>
+  <button id="nextBtn">Next</button>
 </div>
 
-<!-- Background music from your GitHub URL -->
+<!-- Background music from GitHub -->
 <audio id="music" src="https://github.com/rumman436/love-website/blob/main/ScreenRecording_02-05-2026%2014-10-55_1.mp4?raw=true" loop></audio>
 
 <script>
@@ -101,7 +103,7 @@ function typeMessage(text, callback) {
   const messageEl = document.getElementById("message");
   messageEl.textContent = "";
   let i = 0;
-  const speed = 50; // typing speed in ms
+  const speed = 50;
 
   const interval = setInterval(() => {
     messageEl.textContent += text[i];
@@ -113,7 +115,7 @@ function typeMessage(text, callback) {
   }, speed);
 }
 
-// Show next message with typing
+// Show next message
 function nextMessage() {
   if(stepIndex < introMessages.length){
     typeMessage(introMessages[stepIndex], () => {
@@ -129,6 +131,24 @@ function nextMessage() {
 // Initialize first message
 typeMessage(introMessages[0]);
 stepIndex++;
+
+// -------------------- Swipe gestures --------------------
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.addEventListener('touchstart', e => {
+  touchStartX = e.changedTouches[0].screenX;
+}, false);
+
+document.addEventListener('touchend', e => {
+  touchEndX = e.changedTouches[0].screenX;
+  if(touchEndX < touchStartX - 50) { // swipe left
+    nextMessage();
+  }
+  if(touchEndX > touchStartX + 50) { // swipe right
+    nextMessage();
+  }
+}, false);
 
 // -------------------- MAIN GAME --------------------
 function showMainGame() {
@@ -155,6 +175,10 @@ function scaredNo() {
 
   noBtn.style.left = newX + "px";
   noBtn.style.top = newY + "px";
+
+  // iPhone vibration
+  if (navigator.vibrate) navigator.vibrate(100);
+
   noBtn.style.transform = `rotate(${Math.random()*30-15}deg) scale(1.2)`;
   setTimeout(() => { 
     noBtn.style.transform = "rotate(0deg) scale(1)"; 
@@ -164,6 +188,7 @@ function scaredNo() {
 // -------------------- YES BUTTON --------------------
 function yesClick() {
   document.getElementById("music").play(); // play song
+  enableRomanticMode(); // change background gradient
   if(firstYesClick) {
     firstYesClick = false;
     if(confirm("ARE YOU SURE?")) {
@@ -174,6 +199,21 @@ function yesClick() {
   }
 }
 
+// -------------------- ROMANTIC MODE --------------------
+function enableRomanticMode() {
+  const colors = [
+    'linear-gradient(135deg, #ff9a9e, #fad0c4)',
+    'linear-gradient(135deg, #ffb347, #ffcc33)',
+    'linear-gradient(135deg, #ff758c, #ff7eb3)',
+    'linear-gradient(135deg, #ffafbd, #ffc3a0)'
+  ];
+  let i = 0;
+  setInterval(() => {
+    document.body.style.background = colors[i];
+    i = (i + 1) % colors.length;
+  }, 3000);
+}
+
 // -------------------- SHOW LOVE --------------------
 function showLove() {
   const content = document.getElementById("content");
@@ -181,21 +221,25 @@ function showLove() {
     <h1 class="love">I knew it 🥰❤️</h1>
   `;
 
-  for(let i=0; i<100; i++){
-    createConfetti();
+  for(let i=0; i<50; i++){
+    createHearts();
   }
 }
 
-// -------------------- CONFETTI --------------------
-function createConfetti() {
-  const confetti = document.createElement("div");
-  confetti.classList.add("confetti-piece");
-  confetti.style.left = Math.random() * window.innerWidth + "px";
-  confetti.style.backgroundColor = `hsl(${Math.random()*360}, 70%, 60%)`;
-  document.body.appendChild(confetti);
+// -------------------- CREATE FALLING HEARTS --------------------
+function createHearts() {
+  const heart = document.createElement("div");
+  heart.classList.add("heart");
+  heart.textContent = "❤️";
+  heart.style.left = Math.random() * window.innerWidth + "px";
+  heart.style.fontSize = (15 + Math.random()*25) + "px";
+  document.body.appendChild(heart);
 
-  setTimeout(() => { confetti.remove(); }, 3000);
+  setTimeout(() => { heart.remove(); }, 3000);
 }
+
+// -------------------- NEXT BUTTON CLICK --------------------
+document.getElementById("nextBtn").addEventListener("click", nextMessage);
 </script>
 
 </body>
