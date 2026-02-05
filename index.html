@@ -53,6 +53,13 @@ button {
   color: #ff4d6d;
 }
 
+img {
+  max-width: 100%;
+  border-radius: 15px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
 /* Confetti / hearts */
 .confetti-piece {
   position: absolute;
@@ -81,35 +88,106 @@ button {
 <audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
 
 <script>
-// Intro messages sequence
+// -------------------- INTRO MESSAGES --------------------
 const introMessages = [
   "Heyy",
   "I need to ask you a really important question",
   "But are you really Wareesha?",
   "Wareesha Naeem?",
   "Smile if you are Wareesha",
+  "Good",
   "Dance if you are My Wareesha",
-  "Just kidding"
+  "Just kidding 😂"
 ];
 
 let stepIndex = 0;
 
-function nextMessage() {
+// Typing effect function
+function typeMessage(text, callback) {
   const messageEl = document.getElementById("message");
-  stepIndex++;
+  messageEl.textContent = "";
+  let i = 0;
+  const speed = 50; // typing speed in ms
 
+  const interval = setInterval(() => {
+    messageEl.textContent += text[i];
+    i++;
+    if(i >= text.length){
+      clearInterval(interval);
+      if(callback) callback();
+    }
+  }, speed);
+}
+
+// Show next message with typing
+function nextMessage() {
   if(stepIndex < introMessages.length){
-    messageEl.textContent = introMessages[stepIndex];
-  } else {
-    // All intro messages done → show main game
-    showMainGame();
+    typeMessage(introMessages[stepIndex], () => {
+      stepIndex++;
+      // hide Next button if intro finished
+      if(stepIndex >= introMessages.length){
+        document.getElementById("nextBtn").style.display = "none";
+        showVerification();
+      }
+    });
   }
 }
 
 // Initialize first message
-document.getElementById("message").textContent = introMessages[0];
+typeMessage(introMessages[0]);
+stepIndex++;
 
-// MAIN GAME FUNCTIONS
+// -------------------- VERIFICATION PAGE --------------------
+function showVerification() {
+  const content = document.getElementById("content");
+  content.innerHTML = `
+    <h1 id="verifyMsg"></h1>
+    <img src="https://via.placeholder.com/300x400.png?text=Wareesha" alt="Wareesha" id="wareeshaPic">
+    <p>Touch my favorite part of you 😉</p>
+  `;
+
+  typeMessageVerification("Are you really Wareesha? ❤️");
+
+  // Make image clickable
+  const img = document.getElementById("wareeshaPic");
+  img.addEventListener("click", () => {
+    approveWareesha();
+  });
+}
+
+// Typing effect for verification
+function typeMessageVerification(text) {
+  const messageEl = document.getElementById("verifyMsg");
+  messageEl.textContent = "";
+  let i = 0;
+  const speed = 50;
+
+  const interval = setInterval(() => {
+    messageEl.textContent += text[i];
+    i++;
+    if(i >= text.length){
+      clearInterval(interval);
+    }
+  }, speed);
+}
+
+// -------------------- APPROVAL FUNCTION --------------------
+function approveWareesha() {
+  document.getElementById("music").play();
+
+  const content = document.getElementById("content");
+  content.innerHTML = `
+    <h1 class="love">Verified ✅ You are my Wareesha! 🥰❤️</h1>
+  `;
+
+  for(let i=0; i<100; i++){
+    createConfetti();
+  }
+
+  setTimeout(() => { showMainGame(); }, 3000);
+}
+
+// -------------------- MAIN GAME --------------------
 function showMainGame() {
   const content = document.getElementById("content");
   content.innerHTML = `
@@ -121,12 +199,12 @@ function showMainGame() {
 
 let firstYesClick = true;
 
-// Scared No button function
+// -------------------- NO BUTTON --------------------
 function scaredNo() {
   const noBtn = document.getElementById("no");
   const btnWidth = noBtn.offsetWidth;
   const btnHeight = noBtn.offsetHeight;
-  const maxX = window.innerWidth - btnWidth - 10;
+  const maxX = window.innerWidth - btnWidth - 10; 
   const maxY = window.innerHeight - btnHeight - 10;
 
   const newX = Math.random() * maxX;
@@ -135,9 +213,12 @@ function scaredNo() {
   noBtn.style.left = newX + "px";
   noBtn.style.top = newY + "px";
   noBtn.style.transform = `rotate(${Math.random()*30-15}deg) scale(1.2)`;
-  setTimeout(() => { noBtn.style.transform = "rotate(0deg) scale(1)"; }, 200);
+  setTimeout(() => { 
+    noBtn.style.transform = "rotate(0deg) scale(1)"; 
+  }, 200);
 }
 
+// -------------------- YES BUTTON --------------------
 function yesClick() {
   if(firstYesClick) {
     firstYesClick = false;
@@ -149,13 +230,13 @@ function yesClick() {
   }
 }
 
+// -------------------- SHOW LOVE --------------------
 function showLove() {
   document.getElementById("music").play();
 
   const content = document.getElementById("content");
   content.innerHTML = `
     <h1 class="love">I knew it 🥰❤️</h1>
-    <p>You just made my day 💕</p>
   `;
 
   for(let i=0; i<100; i++){
@@ -163,6 +244,7 @@ function showLove() {
   }
 }
 
+// -------------------- CONFETTI --------------------
 function createConfetti() {
   const confetti = document.createElement("div");
   confetti.classList.add("confetti-piece");
