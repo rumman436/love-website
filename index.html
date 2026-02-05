@@ -13,6 +13,7 @@ body {
   align-items: center;
   background: linear-gradient(135deg, #ff9a9e, #fad0c4);
   font-family: Arial, sans-serif;
+  overflow: hidden;
 }
 
 .box {
@@ -21,6 +22,8 @@ body {
   border-radius: 15px;
   text-align: center;
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  z-index: 2;
+  position: relative;
 }
 
 button {
@@ -44,12 +47,28 @@ button {
 }
 
 .love {
-  font-size: 22px;
+  font-size: 24px;
   color: #ff4d6d;
+}
+
+/* Confetti */
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: #ff4d6d;
+  opacity: 0.8;
+  z-index: 1;
+  animation: fall 3s linear forwards;
+  border-radius: 50%;
+}
+
+@keyframes fall {
+  0% {transform: translateY(0) rotate(0deg);}
+  100% {transform: translateY(800px) rotate(360deg);}
 }
 </style>
 </head>
-
 <body>
 
 <div class="box" id="content">
@@ -58,7 +77,12 @@ button {
   <button id="no" onmouseover="moveNo()">No</button>
 </div>
 
+<!-- Background music -->
+<audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
+
 <script>
+let firstYesClick = true;
+
 function moveNo() {
   const noBtn = document.getElementById("no");
   const x = Math.random() * (window.innerWidth - 100);
@@ -68,10 +92,42 @@ function moveNo() {
 }
 
 function yesClick() {
+  if(firstYesClick) {
+    firstYesClick = false;
+    if(confirm("ARE YOU SURE?")) {
+      showLove();
+    }
+  } else {
+    showLove();
+  }
+}
+
+function showLove() {
+  // Play music
+  document.getElementById("music").play();
+
+  // Change content
   document.getElementById("content").innerHTML = `
     <h1 class="love">I knew it 🥰❤️</h1>
     <p>You just made my day 💕</p>
   `;
+
+  // Create confetti
+  for(let i=0; i<100; i++){
+    createConfetti();
+  }
+}
+
+function createConfetti() {
+  const confetti = document.createElement("div");
+  confetti.classList.add("confetti-piece");
+  confetti.style.left = Math.random() * window.innerWidth + "px";
+  confetti.style.backgroundColor = `hsl(${Math.random()*360}, 70%, 60%)`;
+  document.body.appendChild(confetti);
+
+  setTimeout(() => {
+    confetti.remove();
+  }, 3000);
 }
 </script>
 
