@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Do You Love Me?</title>
+<title>My Surprise for Wareesha</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body {
@@ -16,12 +16,13 @@ body {
   overflow: hidden;
 }
 
-.box {
+.container {
+  text-align: center;
   background: white;
   padding: 30px;
   border-radius: 15px;
-  text-align: center;
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  max-width: 90%;
   z-index: 2;
   position: relative;
 }
@@ -32,7 +33,7 @@ button {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  margin: 8px;
+  margin-top: 20px;
   transition: transform 0.2s;
 }
 
@@ -72,16 +73,52 @@ button {
 </head>
 <body>
 
-<div class="box" id="content">
-  <h1>Do you love me? ❤️</h1>
-  <button id="yes" onclick="yesClick()">Yes</button>
-  <button id="no" onmouseenter="scaredNo()">No</button>
+<div class="container" id="content">
+  <h1 id="message"></h1>
+  <button id="nextBtn" onclick="nextMessage()">Next</button>
 </div>
 
-<!-- Background music -->
 <audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
 
 <script>
+// Step by step messages
+const messages = [
+  "Heyy",
+  "I need to ask you a really important question",
+  "But are you really Wareesha?",
+  "Wareesha Naeem?",
+  "Smile if you are Wareesha",
+  "Dance if you are My Wareesha",
+  "Just kidding"
+];
+
+let currentStep = 0;
+
+function nextMessage() {
+  const messageEl = document.getElementById("message");
+  currentStep++;
+
+  if(currentStep < messages.length){
+    messageEl.textContent = messages[currentStep];
+  } else {
+    // All messages done → show main game
+    showMainGame();
+  }
+}
+
+// Initialize first message
+document.getElementById("message").textContent = messages[0];
+
+// MAIN GAME FUNCTIONS
+function showMainGame() {
+  const content = document.getElementById("content");
+  content.innerHTML = `
+    <h1>Do you love me? ❤️</h1>
+    <button id="yes" onclick="yesClick()">Yes</button>
+    <button id="no" onmouseenter="scaredNo()">No</button>
+  `;
+}
+
 let firstYesClick = true;
 
 // Scared No button function
@@ -92,19 +129,13 @@ function scaredNo() {
   const maxX = window.innerWidth - btnWidth - 10;
   const maxY = window.innerHeight - btnHeight - 10;
 
-  // Random new position
-  let newX = Math.random() * maxX;
-  let newY = Math.random() * maxY;
+  const newX = Math.random() * maxX;
+  const newY = Math.random() * maxY;
 
-  // Add a "bounce" effect: move quickly and rotate
-  noBtn.style.transform = `rotate(${Math.random()*30-15}deg) scale(1.2)`;
   noBtn.style.left = newX + "px";
   noBtn.style.top = newY + "px";
-
-  // Reset scale/rotation quickly
-  setTimeout(() => {
-    noBtn.style.transform = "rotate(0deg) scale(1)";
-  }, 200);
+  noBtn.style.transform = `rotate(${Math.random()*30-15}deg) scale(1.2)`;
+  setTimeout(() => { noBtn.style.transform = "rotate(0deg) scale(1)"; }, 200);
 }
 
 function yesClick() {
@@ -122,13 +153,12 @@ function showLove() {
   // Play music
   document.getElementById("music").play();
 
-  // Change content
-  document.getElementById("content").innerHTML = `
+  const content = document.getElementById("content");
+  content.innerHTML = `
     <h1 class="love">I knew it 🥰❤️</h1>
     <p>You just made my day 💕</p>
   `;
 
-  // Create confetti / hearts
   for(let i=0; i<100; i++){
     createConfetti();
   }
@@ -141,9 +171,7 @@ function createConfetti() {
   confetti.style.backgroundColor = `hsl(${Math.random()*360}, 70%, 60%)`;
   document.body.appendChild(confetti);
 
-  setTimeout(() => {
-    confetti.remove();
-  }, 3000);
+  setTimeout(() => { confetti.remove(); }, 3000);
 }
 </script>
 
