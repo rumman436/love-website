@@ -40,7 +40,7 @@ button {
   border-radius: 8px;
   cursor: pointer;
   margin: 10px;
-  transition: 0.3s;
+  transition: transform 0.3s ease, box-shadow 0.3s;
 }
 
 button:hover {
@@ -60,7 +60,19 @@ button:hover {
 #no {
   background: #adb5bd;
   color: black;
-  position: absolute;
+}
+
+/* 💓 Heartbeat animation */
+@keyframes heartbeat {
+  0% { transform: scale(1); }
+  14% { transform: scale(1.15); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.15); }
+  70% { transform: scale(1); }
+}
+
+.heartbeat {
+  animation: heartbeat 1.2s infinite;
 }
 
 .heart {
@@ -101,17 +113,14 @@ const messages = [
 
 let index = 0;
 
-function typeText(text, callback) {
+function typeText(text) {
   const el = document.getElementById("text");
   el.innerHTML = "";
   let i = 0;
   const timer = setInterval(() => {
     el.innerHTML += text[i];
     i++;
-    if (i === text.length) {
-      clearInterval(timer);
-      if (callback) callback();
-    }
+    if (i === text.length) clearInterval(timer);
   }, 50);
 }
 
@@ -127,34 +136,32 @@ document.getElementById("nextBtn").onclick = () => {
   }
 };
 
+let noScale = 1;
+let yesScale = 1;
+
 function showLoveQuestion() {
   const box = document.getElementById("box");
   box.innerHTML = `
     <h1>Do you love me? ❤️</h1>
-    <button id="yes">Yes</button>
+    <button id="yes" class="heartbeat">Yes</button>
     <button id="no">No</button>
   `;
 
-  const noBtn = document.getElementById("no");
-  noBtn.style.left = "50%";
-  noBtn.style.top = "65%";
-  noBtn.style.transform = "translateX(-50%)";
-
-  noBtn.onmouseenter = scareNo;
-  noBtn.onclick = scareNo;
-
   document.getElementById("yes").onclick = yesClicked;
+  document.getElementById("no").onclick = shrinkNoGrowYes;
 }
 
-function scareNo() {
-  const no = document.getElementById("no");
-  const maxX = window.innerWidth - 100;
-  const maxY = window.innerHeight - 100;
+function shrinkNoGrowYes() {
+  const noBtn = document.getElementById("no");
+  const yesBtn = document.getElementById("yes");
 
-  no.style.left = Math.random() * maxX + "px";
-  no.style.top = Math.random() * maxY + "px";
+  noScale = Math.max(0.4, noScale - 0.15);
+  yesScale += 0.15;
 
-  if (navigator.vibrate) navigator.vibrate(100);
+  noBtn.style.transform = `scale(${noScale})`;
+  yesBtn.style.transform = `scale(${yesScale})`;
+
+  if (navigator.vibrate) navigator.vibrate(80);
 }
 
 function yesClicked() {
@@ -176,7 +183,6 @@ function showSecondThoughts() {
     <h1>Having second thoughts? Huh? 😏</h1>
     <button id="nextBtn">Next</button>
   `;
-
   document.getElementById("nextBtn").onclick = showLoveQuestion;
 }
 
@@ -201,13 +207,12 @@ function showIKnewIt() {
   `;
 
   heartBurst();
-
   document.getElementById("nextBtn").onclick = showLoveToo;
 }
 
 function showLoveToo() {
-  const box = document.getElementById("box");
-  box.innerHTML = `<h1>I Love You toooo ❤️</h1>`;
+  document.getElementById("box").innerHTML =
+    `<h1>I Love You toooo ❤️</h1>`;
 }
 
 function heartBurst() {
