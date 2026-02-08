@@ -27,6 +27,10 @@ body {
   max-width: 90%;
 }
 
+h1 {
+  margin-bottom: 20px;
+}
+
 button {
   padding: 12px 24px;
   font-size: 16px;
@@ -34,14 +38,14 @@ button {
   border-radius: 8px;
   cursor: pointer;
   margin: 10px;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s;
 }
 
 button:hover {
   box-shadow: 0 0 20px rgba(255,77,109,0.7);
 }
 
-#nextBtn {
+#nextBtn, #backBtn {
   background: #6c757d;
   color: white;
 }
@@ -51,7 +55,7 @@ button:hover {
   color: white;
 }
 
-/* 💓 heartbeat */
+/* Heartbeat animation */
 @keyframes heartbeat {
   0% { transform: scale(1); }
   14% { transform: scale(1.15); }
@@ -75,9 +79,7 @@ button:hover {
 }
 
 @keyframes fall {
-  to {
-    transform: translateY(800px) rotate(360deg);
-  }
+  to { transform: translateY(800px) rotate(360deg); }
 }
 </style>
 </head>
@@ -94,6 +96,35 @@ button:hover {
 </audio>
 
 <script>
+// ---------- STATE ----------
+let screen = "intro";
+let index = 0;
+let noScale = 1;
+let yesScale = 1;
+
+// ---------- HEARTBEAT SOUND ----------
+let audioCtx;
+let heartbeatOsc;
+
+function startHeartbeatSound() {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  heartbeatOsc = audioCtx.createOscillator();
+  heartbeatOsc.type = "sine";
+  heartbeatOsc.frequency.value = 80;
+  const gain = audioCtx.createGain();
+  gain.gain.value = 0.03;
+  heartbeatOsc.connect(gain).connect(audioCtx.destination);
+  heartbeatOsc.start();
+}
+
+function stopHeartbeatSound() {
+  if (heartbeatOsc) {
+    heartbeatOsc.stop();
+    heartbeatOsc = null;
+  }
+}
+
+// ---------- INTRO ----------
 const messages = [
   "Heyy",
   "I need to ask you a really important question",
@@ -105,111 +136,139 @@ const messages = [
   "Just kidding 😂"
 ];
 
-let index = 0;
-
 function typeText(text) {
   const el = document.getElementById("text");
   el.innerHTML = "";
   let i = 0;
-  const timer = setInterval(() => {
-    el.innerHTML += text[i];
-    i++;
-    if (i === text.length) clearInterval(timer);
+  const t = setInterval(() => {
+    el.innerHTML += text[i++];
+    if (i === text.length) clearInterval(t);
   }, 50);
 }
 
-typeText(messages[index]);
-index++;
+typeText(messages[index++]);
 
 document.getElementById("nextBtn").onclick = () => {
   if (index < messages.length) {
-    typeText(messages[index]);
-    index++;
+    typeText(messages[index++]);
   } else {
     showLoveQuestion();
   }
 };
 
-let noScale = 1;
-let yesScale = 1;
-
+// ---------- LOVE QUESTION ----------
 function showLoveQuestion() {
-  const box = document.getElementById("box");
-  box.innerHTML = `
+  screen = "love";
+  noScale = 1;
+  yesScale = 1;
+  stopMusic();
+
+  document.getElementById("box").innerHTML = `
     <h1>Do you love me? ❤️</h1>
     <button id="yes" class="heartbeat">Yes</button>
-    <button id="no">No</button>
+    <button id="no">No</button><br>
+    <button id="backBtn">Back</button>
   `;
 
-  document.getElementById("yes").onclick = yesClicked;
-  document.getElementById("no").onclick = shrinkAndVanishNo;
+  const yes = document.getElementById("yes");
+  yes.onmouseenter = startHeartbeatSound;
+  yes.onmouseleave = stopHeartbeatSound;
+  yes.onclick = yesClicked;
+
+  document.getElementById("no").onclick = shrinkNoGrowYes;
+  document.getElementById("backBtn").onclick = goBack;
 }
 
-function shrinkAndVanishNo() {
-  const noBtn = document.getElementById("no");
-  const yesBtn = document.getElementById("yes");
-
+function shrinkNoGrowYes() {
   noScale -= 0.2;
   yesScale += 0.2;
 
+  const no = document.getElementById("no");
+  const yes = document.getElementById("yes");
+
   if (noScale <= 0.15) {
-    noBtn.style.opacity = "0";
-    noBtn.disabled = true;
+    no.style.opacity = "0";
+    no.disabled = true;
   } else {
-    noBtn.style.transform = `scale(${noScale})`;
+    no.style.transform = `scale(${noScale})`;
   }
 
-  yesBtn.style.transform = `scale(${yesScale})`;
-
-  if (navigator.vibrate) navigator.vibrate(80);
+  yes.style.transform = `scale(${yesScale})`;
+  navigator.vibrate?.(80);
 }
 
+// ---------- YES ----------
 function yesClicked() {
-  document.getElementById("music").play().catch(()=>{});
-
+  stopHeartbeatSound();
   if (!confirm("ARE YOU SURE?")) {
     showSecondThoughts();
     return;
   }
 
+  playMusic();
   romanticMode();
   showIKnewIt();
 }
 
+// ---------- SECOND THOUGHTS ----------
 function showSecondThoughts() {
-  const box = document.getElementById("box");
-  box.innerHTML = `
+  screen = "second";
+  stopMusic();
+
+  document.getElementById("box").innerHTML = `
     <h1>Having second thoughts? Huh? 😏</h1>
     <button id="nextBtn">Next</button>
+    <button id="backBtn">Back</button>
   `;
+
   document.getElementById("nextBtn").onclick = showLoveQuestion;
+  document.getElementById("backBtn").onclick = goBack;
 }
 
-function romanticMode() {
-  const colors = [
-    'linear-gradient(135deg,#ff758c,#ff7eb3)',
-    'linear-gradient(135deg,#ff9a9e,#fad0c4)',
-    'linear-gradient(135deg,#ffc3a0,#ffafbd)'
-  ];
-  let i = 0;
-  setInterval(() => {
-    document.body.style.background = colors[i++ % colors.length];
-  }, 1200);
-}
-
+// ---------- FINAL ----------
 function showIKnewIt() {
-  const box = document.getElementById("box");
-  box.innerHTML = `
+  screen = "knew";
+  document.getElementById("box").innerHTML = `
     <h1>I knew it 🥰</h1>
     <button id="nextBtn">Next</button>
+    <button id="backBtn">Back</button>
   `;
   heartBurst();
   document.getElementById("nextBtn").onclick = showLoveToo;
+  document.getElementById("backBtn").onclick = goBack;
 }
 
 function showLoveToo() {
   document.getElementById("box").innerHTML =
     `<h1>I Love You toooo ❤️</h1>`;
+}
+
+// ---------- BACK ----------
+function goBack() {
+  stopMusic();
+  location.reload(); // clean & safe reset
+}
+
+// ---------- MUSIC ----------
+function playMusic() {
+  document.getElementById("music").play().catch(()=>{});
+}
+function stopMusic() {
+  const m = document.getElementById("music");
+  m.pause();
+  m.currentTime = 0;
+}
+
+// ---------- EFFECTS ----------
+function romanticMode() {
+  const colors = [
+    'linear-gradient(135deg,#ff758c,#ff7eb3)',
+    'linear-gradient(135deg,#ff9a9e,#fad0c4)'
+  ];
+  let i = 0;
+  setInterval(() => {
+    document.body.style.background = colors[i++ % colors.length];
+  }, 1200);
 }
 
 function heartBurst() {
