@@ -47,7 +47,6 @@ button:hover {
   box-shadow: 0 0 20px rgba(255,77,109,0.7);
 }
 
-/* Next / Back layout */
 .nav-buttons {
   display: flex;
   justify-content: space-between; /* Back left, Next right */
@@ -59,7 +58,10 @@ button:hover {
   color: white;
 }
 
-/* Heartbeat animation */
+.heartbeat {
+  animation: heartbeat 1.2s infinite;
+}
+
 @keyframes heartbeat {
   0% { transform: scale(1); }
   14% { transform: scale(1.15); }
@@ -67,16 +69,12 @@ button:hover {
   42% { transform: scale(1.15); }
   70% { transform: scale(1); }
 }
-.heartbeat {
-  animation: heartbeat 1.2s infinite;
-}
 
 #no {
   background: #adb5bd;
   color: black;
 }
 
-/* Hearts */
 .heart {
   position: absolute;
   font-size: 22px;
@@ -111,8 +109,6 @@ let screen = "intro";
 
 let audioCtx;
 let heartbeatOsc;
-
-// Keep track of previous messages for back
 const historyStack = [];
 
 // Heartbeat sound
@@ -156,7 +152,7 @@ function typeText(text) {
   }, 50);
 }
 
-// Initialize first message
+// Initial message
 typeText(messages[index++]);
 historyStack.push(messages[index-1]);
 
@@ -277,7 +273,7 @@ function showIKnewIt() {
   document.getElementById("backBtn").onclick = goBack;
 }
 
-// I Love You too + paragraph
+// I Love You too
 function showLoveToo() {
   const box = document.getElementById("box");
   box.innerHTML = `
@@ -292,31 +288,46 @@ function showLoveToo() {
   document.getElementById("backBtn").onclick = goBack;
 }
 
-// Cute paragraph fade in
+// Cute paragraph with your exact lines
 function showCuteParagraph() {
   const box = document.getElementById("box");
   box.innerHTML = "";
+
   const lines = [
     "Not gonna ask you to be my Valentine…",
     "because you’re already mine 😌",
     "I wanna be the guy who wakes up with you every morning,",
     "sleeps next to you every night,",
     "watches movies with you,",
-    "watches you eat your lunch like it’s my favorite show,",
-    "and gets unlimited access to your drama 💝"
+    "watch you eat your lunch like it’s my favorite show,",
+    "and unlimited access to your drama 💝"
   ];
+
   lines.forEach(line=>{
     const p = document.createElement("p");
     p.textContent = line;
     p.style.opacity = 0;
     p.style.transition = "opacity 1s";
-    p.style.fontSize="18px";
+    p.style.fontSize = "18px";
     box.appendChild(p);
   });
+
   const paragraphs = box.querySelectorAll("p");
   paragraphs.forEach((p,i)=>{
-    setTimeout(()=>p.style.opacity=1,i*1200);
+    setTimeout(()=>p.style.opacity=1, i*1200);
   });
+
+  // Add nav buttons
+  const navDiv = document.createElement("div");
+  navDiv.className = "nav-buttons";
+  navDiv.innerHTML = `
+    <button id="backBtn">Back</button>
+    <button id="nextBtn">End</button>
+  `;
+  box.appendChild(navDiv);
+
+  document.getElementById("backBtn").onclick = goBack;
+  document.getElementById("nextBtn").onclick = ()=>alert("Flow Completed 😘");
 }
 
 // Back button reload
