@@ -112,6 +112,9 @@ let screen = "intro";
 let audioCtx;
 let heartbeatOsc;
 
+// Keep track of previous messages for back
+const historyStack = [];
+
 // Heartbeat sound
 function startHeartbeatSound() {
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -153,26 +156,32 @@ function typeText(text) {
   }, 50);
 }
 
-// Initial message
+// Initialize first message
 typeText(messages[index++]);
+historyStack.push(messages[index-1]);
 
 const nextBtn = document.getElementById("nextBtn");
 const backBtn = document.getElementById("backBtn");
 
 nextBtn.onclick = () => {
-  backBtn.style.visibility = "visible"; // show back after first click
   if (index < messages.length) {
-    typeText(messages[index++]);
+    typeText(messages[index]);
+    historyStack.push(messages[index]);
+    index++;
+    backBtn.style.visibility = "visible";
   } else {
     showLoveQuestion();
   }
 };
 
 backBtn.onclick = () => {
-  if(index > 1){
-    index -= 2; // Go back one message
-    typeText(messages[index++]);
-    if(index===1) backBtn.style.visibility="hidden";
+  if(historyStack.length>1){
+    index--;
+    historyStack.pop();
+    typeText(historyStack[historyStack.length-1]);
+    if(historyStack.length===1){
+      backBtn.style.visibility="hidden";
+    }
   }
 };
 
@@ -310,7 +319,7 @@ function showCuteParagraph() {
   });
 }
 
-// Back button
+// Back button reload
 function goBack() {
   stopMusic();
   location.reload();
