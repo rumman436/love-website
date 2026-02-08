@@ -14,8 +14,8 @@ body {
   align-items: center;
   font-family: Arial, sans-serif;
   background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-  overflow: hidden;
   transition: background 2s ease;
+  overflow: hidden;
 }
 
 .container {
@@ -25,12 +25,6 @@ body {
   box-shadow: 0 15px 40px rgba(0,0,0,0.2);
   text-align: center;
   max-width: 90%;
-  position: relative;
-  z-index: 2;
-}
-
-h1 {
-  margin-bottom: 20px;
 }
 
 button {
@@ -40,7 +34,7 @@ button {
   border-radius: 8px;
   cursor: pointer;
   margin: 10px;
-  transition: transform 0.3s ease, box-shadow 0.3s;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 button:hover {
@@ -57,12 +51,7 @@ button:hover {
   color: white;
 }
 
-#no {
-  background: #adb5bd;
-  color: black;
-}
-
-/* 💓 Heartbeat animation */
+/* 💓 heartbeat */
 @keyframes heartbeat {
   0% { transform: scale(1); }
   14% { transform: scale(1.15); }
@@ -70,9 +59,13 @@ button:hover {
   42% { transform: scale(1.15); }
   70% { transform: scale(1); }
 }
-
 .heartbeat {
   animation: heartbeat 1.2s infinite;
+}
+
+#no {
+  background: #adb5bd;
+  color: black;
 }
 
 .heart {
@@ -82,8 +75,9 @@ button:hover {
 }
 
 @keyframes fall {
-  0% { transform: translateY(0) rotate(0deg); }
-  100% { transform: translateY(800px) rotate(360deg); }
+  to {
+    transform: translateY(800px) rotate(360deg);
+  }
 }
 </style>
 </head>
@@ -148,17 +142,23 @@ function showLoveQuestion() {
   `;
 
   document.getElementById("yes").onclick = yesClicked;
-  document.getElementById("no").onclick = shrinkNoGrowYes;
+  document.getElementById("no").onclick = shrinkAndVanishNo;
 }
 
-function shrinkNoGrowYes() {
+function shrinkAndVanishNo() {
   const noBtn = document.getElementById("no");
   const yesBtn = document.getElementById("yes");
 
-  noScale = Math.max(0.4, noScale - 0.15);
-  yesScale += 0.15;
+  noScale -= 0.2;
+  yesScale += 0.2;
 
-  noBtn.style.transform = `scale(${noScale})`;
+  if (noScale <= 0.15) {
+    noBtn.style.opacity = "0";
+    noBtn.disabled = true;
+  } else {
+    noBtn.style.transform = `scale(${noScale})`;
+  }
+
   yesBtn.style.transform = `scale(${yesScale})`;
 
   if (navigator.vibrate) navigator.vibrate(80);
@@ -167,8 +167,7 @@ function shrinkNoGrowYes() {
 function yesClicked() {
   document.getElementById("music").play().catch(()=>{});
 
-  const sure = confirm("ARE YOU SURE?");
-  if (!sure) {
+  if (!confirm("ARE YOU SURE?")) {
     showSecondThoughts();
     return;
   }
@@ -194,8 +193,7 @@ function romanticMode() {
   ];
   let i = 0;
   setInterval(() => {
-    document.body.style.background = colors[i % colors.length];
-    i++;
+    document.body.style.background = colors[i++ % colors.length];
   }, 1200);
 }
 
@@ -205,7 +203,6 @@ function showIKnewIt() {
     <h1>I knew it 🥰</h1>
     <button id="nextBtn">Next</button>
   `;
-
   heartBurst();
   document.getElementById("nextBtn").onclick = showLoveToo;
 }
