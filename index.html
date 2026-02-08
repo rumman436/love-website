@@ -25,6 +25,8 @@ body {
   box-shadow: 0 15px 40px rgba(0,0,0,0.2);
   text-align: center;
   max-width: 90%;
+  position: relative;
+  z-index: 2;
 }
 
 h1 {
@@ -72,6 +74,7 @@ button:hover {
   color: black;
 }
 
+/* Hearts */
 .heart {
   position: absolute;
   font-size: 22px;
@@ -97,10 +100,10 @@ button:hover {
 
 <script>
 // ---------- STATE ----------
-let screen = "intro";
 let index = 0;
 let noScale = 1;
 let yesScale = 1;
+let screen = "intro";
 
 // ---------- HEARTBEAT SOUND ----------
 let audioCtx;
@@ -238,15 +241,54 @@ function showIKnewIt() {
   document.getElementById("backBtn").onclick = goBack;
 }
 
+// ---------- LOVE TOO + CUTE PARAGRAPH ----------
 function showLoveToo() {
-  document.getElementById("box").innerHTML =
-    `<h1>I Love You toooo ❤️</h1>`;
+  const box = document.getElementById("box");
+  box.innerHTML = `
+    <h1>I Love You toooo ❤️</h1>
+    <button id="nextBtn">Next</button>
+    <button id="backBtn">Back</button>
+  `;
+
+  document.getElementById("nextBtn").onclick = showCuteParagraph;
+  document.getElementById("backBtn").onclick = goBack;
+}
+
+function showCuteParagraph() {
+  const box = document.getElementById("box");
+  box.innerHTML = "";
+
+  const lines = [
+    "Not gonna ask you to be my Valentine…",
+    "because you’re already mine 😌",
+    "I wanna be the guy who wakes up with you every morning,",
+    "sleeps next to you every night,",
+    "watches movies with you,",
+    "watches you eat your lunch like it’s my favorite show,",
+    "and gets unlimited access to your drama 💝"
+  ];
+
+  lines.forEach(line => {
+    const p = document.createElement("p");
+    p.textContent = line;
+    p.style.opacity = 0;
+    p.style.transition = "opacity 1s";
+    p.style.fontSize = "18px";
+    box.appendChild(p);
+  });
+
+  const paragraphs = box.querySelectorAll("p");
+  paragraphs.forEach((p, i) => {
+    setTimeout(() => {
+      p.style.opacity = 1;
+    }, i * 1200);
+  });
 }
 
 // ---------- BACK ----------
 function goBack() {
   stopMusic();
-  location.reload(); // clean & safe reset
+  location.reload(); // simple clean reset
 }
 
 // ---------- MUSIC ----------
