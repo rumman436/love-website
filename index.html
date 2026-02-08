@@ -47,10 +47,9 @@ button:hover {
   box-shadow: 0 0 20px rgba(255,77,109,0.7);
 }
 
-.nav-buttons {
-  display: flex;
-  justify-content: space-between; /* Back left, Next right */
-  margin-top: 20px;
+#nextBtn, #backBtn {
+  background: #6c757d;
+  color: white;
 }
 
 #yes {
@@ -58,10 +57,7 @@ button:hover {
   color: white;
 }
 
-.heartbeat {
-  animation: heartbeat 1.2s infinite;
-}
-
+/* Heartbeat animation */
 @keyframes heartbeat {
   0% { transform: scale(1); }
   14% { transform: scale(1.15); }
@@ -69,12 +65,16 @@ button:hover {
   42% { transform: scale(1.15); }
   70% { transform: scale(1); }
 }
+.heartbeat {
+  animation: heartbeat 1.2s infinite;
+}
 
 #no {
   background: #adb5bd;
   color: black;
 }
 
+/* Hearts */
 .heart {
   position: absolute;
   font-size: 22px;
@@ -91,10 +91,7 @@ button:hover {
 
 <div class="container" id="box">
   <h1 id="text"></h1>
-  <div class="nav-buttons">
-    <button id="backBtn" style="visibility:hidden;">Back</button>
-    <button id="nextBtn">Next</button>
-  </div>
+  <button id="nextBtn">Next</button>
 </div>
 
 <audio id="music" loop>
@@ -102,16 +99,16 @@ button:hover {
 </audio>
 
 <script>
+// ---------- STATE ----------
 let index = 0;
 let noScale = 1;
 let yesScale = 1;
 let screen = "intro";
 
+// ---------- HEARTBEAT SOUND ----------
 let audioCtx;
 let heartbeatOsc;
-const historyStack = [];
 
-// Heartbeat sound
 function startHeartbeatSound() {
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   heartbeatOsc = audioCtx.createOscillator();
@@ -130,7 +127,7 @@ function stopHeartbeatSound() {
   }
 }
 
-// Intro messages
+// ---------- INTRO ----------
 const messages = [
   "Heyy",
   "I need to ask you a really important question",
@@ -152,51 +149,28 @@ function typeText(text) {
   }, 50);
 }
 
-// Initial message
 typeText(messages[index++]);
-historyStack.push(messages[index-1]);
 
-const nextBtn = document.getElementById("nextBtn");
-const backBtn = document.getElementById("backBtn");
-
-nextBtn.onclick = () => {
+document.getElementById("nextBtn").onclick = () => {
   if (index < messages.length) {
-    typeText(messages[index]);
-    historyStack.push(messages[index]);
-    index++;
-    backBtn.style.visibility = "visible";
+    typeText(messages[index++]);
   } else {
     showLoveQuestion();
   }
 };
 
-backBtn.onclick = () => {
-  if(historyStack.length>1){
-    index--;
-    historyStack.pop();
-    typeText(historyStack[historyStack.length-1]);
-    if(historyStack.length===1){
-      backBtn.style.visibility="hidden";
-    }
-  }
-};
-
-// LOVE QUESTION
+// ---------- LOVE QUESTION ----------
 function showLoveQuestion() {
   screen = "love";
   noScale = 1;
   yesScale = 1;
   stopMusic();
 
-  const box = document.getElementById("box");
-  box.innerHTML = `
+  document.getElementById("box").innerHTML = `
     <h1>Do you love me? ❤️</h1>
     <button id="yes" class="heartbeat">Yes</button>
-    <button id="no">No</button>
-    <div class="nav-buttons">
-      <button id="backBtn">Back</button>
-      <button id="nextBtn" style="visibility:hidden;"></button>
-    </div>
+    <button id="no">No</button><br>
+    <button id="backBtn">Back</button>
   `;
 
   const yes = document.getElementById("yes");
@@ -208,7 +182,6 @@ function showLoveQuestion() {
   document.getElementById("backBtn").onclick = goBack;
 }
 
-// NO button shrink
 function shrinkNoGrowYes() {
   noScale -= 0.2;
   yesScale += 0.2;
@@ -227,68 +200,60 @@ function shrinkNoGrowYes() {
   navigator.vibrate?.(80);
 }
 
-// YES button
+// ---------- YES ----------
 function yesClicked() {
   stopHeartbeatSound();
-  if(!confirm("ARE YOU SURE?")) {
+  if (!confirm("ARE YOU SURE?")) {
     showSecondThoughts();
     return;
   }
+
   playMusic();
   romanticMode();
   showIKnewIt();
 }
 
-// Second thoughts
+// ---------- SECOND THOUGHTS ----------
 function showSecondThoughts() {
   screen = "second";
   stopMusic();
 
-  const box = document.getElementById("box");
-  box.innerHTML = `
+  document.getElementById("box").innerHTML = `
     <h1>Having second thoughts? Huh? 😏</h1>
-    <div class="nav-buttons">
-      <button id="backBtn">Back</button>
-      <button id="nextBtn">Next</button>
-    </div>
+    <button id="nextBtn">Next</button>
+    <button id="backBtn">Back</button>
   `;
 
   document.getElementById("nextBtn").onclick = showLoveQuestion;
   document.getElementById("backBtn").onclick = goBack;
 }
 
-// I Knew it
+// ---------- FINAL ----------
 function showIKnewIt() {
   screen = "knew";
-  const box = document.getElementById("box");
-  box.innerHTML = `
+  document.getElementById("box").innerHTML = `
     <h1>I knew it 🥰</h1>
-    <div class="nav-buttons">
-      <button id="backBtn">Back</button>
-      <button id="nextBtn">Next</button>
-    </div>
+    <button id="nextBtn">Next</button>
+    <button id="backBtn">Back</button>
   `;
   heartBurst();
   document.getElementById("nextBtn").onclick = showLoveToo;
   document.getElementById("backBtn").onclick = goBack;
 }
 
-// I Love You too
+// ---------- LOVE TOO + CUTE PARAGRAPH ----------
 function showLoveToo() {
   const box = document.getElementById("box");
   box.innerHTML = `
     <h1>I Love You toooo ❤️</h1>
-    <div class="nav-buttons">
-      <button id="backBtn">Back</button>
-      <button id="nextBtn">Next</button>
-    </div>
+    <button id="nextBtn">Next</button>
+    <button id="backBtn">Back</button>
   `;
 
   document.getElementById("nextBtn").onclick = showCuteParagraph;
   document.getElementById("backBtn").onclick = goBack;
 }
 
-// Cute paragraph with your exact lines
 function showCuteParagraph() {
   const box = document.getElementById("box");
   box.innerHTML = "";
@@ -299,11 +264,11 @@ function showCuteParagraph() {
     "I wanna be the guy who wakes up with you every morning,",
     "sleeps next to you every night,",
     "watches movies with you,",
-    "watch you eat your lunch like it’s my favorite show,",
-    "and unlimited access to your drama 💝"
+    "watches you eat your lunch like it’s my favorite show,",
+    "and gets unlimited access to your drama 💝"
   ];
 
-  lines.forEach(line=>{
+  lines.forEach(line => {
     const p = document.createElement("p");
     p.textContent = line;
     p.style.opacity = 0;
@@ -313,57 +278,49 @@ function showCuteParagraph() {
   });
 
   const paragraphs = box.querySelectorAll("p");
-  paragraphs.forEach((p,i)=>{
-    setTimeout(()=>p.style.opacity=1, i*1200);
+  paragraphs.forEach((p, i) => {
+    setTimeout(() => {
+      p.style.opacity = 1;
+    }, i * 1200);
   });
-
-  // Add nav buttons
-  const navDiv = document.createElement("div");
-  navDiv.className = "nav-buttons";
-  navDiv.innerHTML = `
-    <button id="backBtn">Back</button>
-    <button id="nextBtn">End</button>
-  `;
-  box.appendChild(navDiv);
-
-  document.getElementById("backBtn").onclick = goBack;
-  document.getElementById("nextBtn").onclick = ()=>alert("Flow Completed 😘");
 }
 
-// Back button reload
+// ---------- BACK ----------
 function goBack() {
   stopMusic();
-  location.reload();
+  location.reload(); // simple clean reset
 }
 
-// Music
+// ---------- MUSIC ----------
 function playMusic() {
   document.getElementById("music").play().catch(()=>{});
 }
 function stopMusic() {
   const m = document.getElementById("music");
   m.pause();
-  m.currentTime=0;
+  m.currentTime = 0;
 }
 
-// Effects
+// ---------- EFFECTS ----------
 function romanticMode() {
   const colors = [
     'linear-gradient(135deg,#ff758c,#ff7eb3)',
     'linear-gradient(135deg,#ff9a9e,#fad0c4)'
   ];
-  let i=0;
-  setInterval(()=>document.body.style.background=colors[i++%colors.length],1200);
+  let i = 0;
+  setInterval(() => {
+    document.body.style.background = colors[i++ % colors.length];
+  }, 1200);
 }
 
 function heartBurst() {
-  for(let i=0;i<20;i++){
-    const h=document.createElement("div");
-    h.className="heart";
-    h.innerHTML="❤️";
-    h.style.left=Math.random()*window.innerWidth+"px";
+  for (let i = 0; i < 20; i++) {
+    const h = document.createElement("div");
+    h.className = "heart";
+    h.innerHTML = "❤️";
+    h.style.left = Math.random() * window.innerWidth + "px";
     document.body.appendChild(h);
-    setTimeout(()=>h.remove(),3000);
+    setTimeout(() => h.remove(), 3000);
   }
 }
 </script>
