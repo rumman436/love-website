@@ -47,12 +47,6 @@ button:hover {
   box-shadow: 0 0 20px rgba(255,77,109,0.7);
 }
 
-.nav-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
 #yes {
   background: #ff4d6d;
   color: white;
@@ -84,6 +78,10 @@ button:hover {
 @keyframes fall {
   to { transform: translateY(800px) rotate(360deg); }
 }
+
+.nav-buttons {
+  margin-top: 20px;
+}
 </style>
 </head>
 
@@ -92,7 +90,6 @@ button:hover {
 <div class="container" id="box">
   <h1 id="text"></h1>
   <div class="nav-buttons">
-    <button id="backBtn" style="visibility:hidden;">Back</button>
     <button id="nextBtn">Next</button>
   </div>
 </div>
@@ -107,7 +104,7 @@ let historyStack = [];
 let noScale = 1;
 let yesScale = 1;
 
-// Messages for intro
+// Intro messages
 const introMessages = [
   "Heyy",
   "I need to ask you a really important question",
@@ -122,42 +119,38 @@ const introMessages = [
 const box = document.getElementById("box");
 const textEl = document.getElementById("text");
 const nextBtn = document.getElementById("nextBtn");
-const backBtn = document.getElementById("backBtn");
 
 function renderStep(step) {
-  backBtn.style.visibility = stepIndex > 0 ? "visible" : "hidden";
-
   switch(step.type) {
     case "text":
       textEl.textContent = step.content;
       nextBtn.style.visibility = "visible";
+      nextBtn.onclick = () => nextStep();
       break;
     case "love":
       box.innerHTML = `
         <h1>Do you love me? ❤️</h1>
         <button id="yes" class="heartbeat">Yes</button>
         <button id="no">No</button>
-        <div class="nav-buttons">
-          <button id="backBtn">Back</button>
-          <button id="nextBtn" style="visibility:hidden;"></button>
-        </div>
       `;
       document.getElementById("yes").onclick = yesClicked;
       document.getElementById("no").onclick = shrinkNoGrowYes;
-      document.getElementById("backBtn").onclick = goBack;
       break;
     case "secondThoughts":
       textEl.textContent = "Having second thoughts? Huh? 😏";
       nextBtn.onclick = () => pushStep({type:"love"});
+      nextBtn.style.visibility = "visible";
       break;
     case "iknewit":
       textEl.textContent = "I knew it 🥰";
       heartBurst();
       nextBtn.onclick = () => pushStep({type:"loveToo"});
+      nextBtn.style.visibility = "visible";
       break;
     case "loveToo":
       textEl.textContent = "I Love You toooo ❤️";
       nextBtn.onclick = () => pushStep({type:"paragraph"});
+      nextBtn.style.visibility = "visible";
       break;
     case "paragraph":
       box.innerHTML = `
@@ -169,12 +162,10 @@ function renderStep(step) {
         <p>watch you eat your lunch like it’s my favorite show,</p>
         <p>and unlimited access to your drama 💝</p>
         <div class="nav-buttons">
-          <button id="backBtn">Back</button>
           <button id="nextBtn">End</button>
         </div>
       `;
-      document.getElementById("backBtn").onclick = goBack;
-      document.getElementById("nextBtn").onclick = ()=>alert("Flow Completed 😘");
+      document.getElementById("nextBtn").onclick = () => alert("Flow Completed 😘");
       break;
   }
 }
@@ -186,29 +177,21 @@ function pushStep(step) {
   renderStep(step);
 }
 
-function goBack() {
-  if(stepIndex > 0){
-    stepIndex--;
-    const step = historyStack[stepIndex];
-    renderStep(step);
-    historyStack = historyStack.slice(0, stepIndex+1);
-  }
-}
-
-// Intro steps
-introMessages.forEach(msg => historyStack.push({type:"text", content: msg}));
-
-// Set initial step
-renderStep(historyStack[0]);
-
-nextBtn.onclick = () => {
+function nextStep() {
   if(stepIndex < historyStack.length -1){
     stepIndex++;
     renderStep(historyStack[stepIndex]);
   } else {
     pushStep({type:"love"});
   }
-};
+}
+
+// Prepare intro steps
+introMessages.forEach(msg => historyStack.push({type:"text", content: msg}));
+
+// Set initial step
+renderStep(historyStack[0]);
+nextBtn.onclick = () => nextStep();
 
 // YES/NO logic
 function shrinkNoGrowYes() {
@@ -250,11 +233,6 @@ function heartBurst() {
 
 function playMusic(){
   document.getElementById("music").play().catch(()=>{});
-}
-function stopMusic(){
-  const m = document.getElementById("music");
-  m.pause();
-  m.currentTime=0;
 }
 
 function romanticMode(){
