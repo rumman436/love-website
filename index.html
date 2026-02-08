@@ -99,6 +99,7 @@ button:hover {
 </audio>
 
 <script>
+// ---------------- Intro messages ----------------
 const introMessages = [
   "Heyy",
   "I need to ask you a really important question",
@@ -110,20 +111,33 @@ const introMessages = [
   "Just kidding 😂"
 ];
 
+const paragraphLines = [
+  "Not gonna ask you to be my Valentine…",
+  "because you’re already mine 😌",
+  "I wanna be the guy who wakes up with you every morning,",
+  "sleeps next to you every night,",
+  "watches movies with you,",
+  "watch you eat your lunch like it’s my favorite show,",
+  "and unlimited access to your drama 💝"
+];
+
 let stepIndex = 0;
+let introIndex = 0;
+let paragraphIndex = 0;
 let noScale = 1;
 let yesScale = 1;
+
 const box = document.getElementById("box");
 const textEl = document.getElementById("text");
 const nextBtn = document.getElementById("nextBtn");
 
-// Typing animation for intro
-function typeMessage(message, callback) {
+// Typing animation function
+function typeText(text, callback) {
   textEl.textContent = "";
   let i = 0;
   const interval = setInterval(() => {
-    textEl.textContent += message[i++];
-    if (i >= message.length) {
+    textEl.textContent += text[i++];
+    if (i >= text.length) {
       clearInterval(interval);
       if (callback) callback();
     }
@@ -131,25 +145,23 @@ function typeMessage(message, callback) {
 }
 
 // Show next intro message
-function showNextIntro() {
-  if (stepIndex < introMessages.length) {
-    typeMessage(introMessages[stepIndex], () => {});
-    stepIndex++;
+function nextIntro() {
+  if (introIndex < introMessages.length) {
+    typeText(introMessages[introIndex], () => {});
+    introIndex++;
   } else {
     showLoveQuestion();
   }
 }
 
-// Initial display
-typeMessage(introMessages[0]);
-stepIndex = 1;
-
-// Next button for intro
+// ---------------- Next button ----------------
 nextBtn.onclick = () => {
-  showNextIntro();
+  if (introIndex < introMessages.length) {
+    nextIntro();
+  }
 };
 
-// LOVE QUESTION
+// ---------------- LOVE QUESTION ----------------
 function showLoveQuestion() {
   box.innerHTML = `
     <h1>Do you love me? ❤️</h1>
@@ -187,43 +199,54 @@ function yesClicked() {
   showIKnewIt();
 }
 
-// Second thoughts if cancel
 function showSecondThoughts() {
   textEl.textContent = "Having second thoughts? Huh? 😏";
   nextBtn.onclick = () => showLoveQuestion();
 }
 
-// I knew it
+// ---------------- I KNEW IT ----------------
 function showIKnewIt() {
-  textEl.textContent = "I knew it 🥰";
-  heartBurst();
-  nextBtn.onclick = () => showLoveToo();
+  typeText("I knew it 🥰", () => {
+    heartBurst();
+    nextBtn.onclick = showLoveToo;
+  });
 }
 
-// I Love You too
+// ---------------- I LOVE YOU TOO ----------------
 function showLoveToo() {
-  textEl.textContent = "I Love You toooo ❤️";
-  nextBtn.onclick = () => showParagraph();
+  typeText("I Love You toooo ❤️", () => {
+    nextBtn.onclick = showParagraph;
+  });
 }
 
-// Paragraph
+// ---------------- Paragraph ----------------
 function showParagraph() {
-  box.innerHTML = `
-    <p>Not gonna ask you to be my Valentine…</p>
-    <p>because you’re already mine 😌</p>
-    <p>I wanna be the guy who wakes up with you every morning,</p>
-    <p>sleeps next to you every night,</p>
-    <p>watches movies with you,</p>
-    <p>watch you eat your lunch like it’s my favorite show,</p>
-    <p>and unlimited access to your drama 💝</p>
-    <div class="nav-buttons">
-      <button id="nextBtn">End</button>
-    </div>
-  `;
+  box.innerHTML = `<div id="para"></div><div class="nav-buttons"><button id="nextBtn">End</button></div>`;
+  const paraDiv = document.getElementById("para");
+  paragraphIndex = 0;
+
+  function typeLine() {
+    if (paragraphIndex < paragraphLines.length) {
+      const p = document.createElement("p");
+      paraDiv.appendChild(p);
+      let text = paragraphLines[paragraphIndex];
+      let i = 0;
+      const interval = setInterval(() => {
+        p.textContent += text[i++];
+        if (i >= text.length) {
+          clearInterval(interval);
+          paragraphIndex++;
+          typeLine();
+        }
+      }, 50);
+    }
+  }
+  typeLine();
+
   document.getElementById("nextBtn").onclick = () => alert("Flow Completed 😘");
 }
 
-// Hearts & Music
+// ---------------- Hearts & Music ----------------
 function heartBurst() {
   for(let i=0;i<20;i++){
     const h=document.createElement("div");
@@ -247,7 +270,11 @@ function romanticMode(){
   let i=0;
   setInterval(()=>document.body.style.background=colors[i++%colors.length],1200);
 }
-</script>
 
+// ---------------- Start first intro ----------------
+typeText(introMessages[0]);
+introIndex = 1;
+
+</script>
 </body>
 </html>
