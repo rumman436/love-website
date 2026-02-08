@@ -4,91 +4,91 @@
 <meta charset="UTF-8">
 <title>Love Website</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 body {
-  height: 100vh;
   margin: 0;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
   font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
   overflow: hidden;
-  transition: background 3s ease;
+  transition: background 2s ease;
 }
 
 .container {
-  text-align: center;
   background: white;
   padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  border-radius: 16px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+  text-align: center;
   max-width: 90%;
-  z-index: 2;
   position: relative;
+  z-index: 2;
+}
+
+h1 {
+  margin-bottom: 20px;
 }
 
 button {
-  padding: 12px 22px;
+  padding: 12px 24px;
   font-size: 16px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  margin-top: 20px;
-  transition: transform 0.2s, box-shadow 0.3s;
+  margin: 10px;
+  transition: 0.3s;
 }
 
-/* Button glow effect */
 button:hover {
-  box-shadow: 0 0 20px 5px rgba(255,77,109,0.7);
+  box-shadow: 0 0 20px rgba(255,77,109,0.7);
+}
+
+#nextBtn {
+  background: #6c757d;
+  color: white;
 }
 
 #yes {
-  background-color: #ff4d6d;
+  background: #ff4d6d;
   color: white;
 }
 
 #no {
-  background-color: #adb5bd;
+  background: #adb5bd;
   color: black;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 }
 
-.love {
-  font-size: 24px;
-  color: #ff4d6d;
-}
-
-/* Falling hearts */
 .heart {
   position: absolute;
-  font-size: 20px;
+  font-size: 22px;
   animation: fall 3s linear forwards;
-  z-index: 1;
 }
 
 @keyframes fall {
-  0% { transform: translateY(0) rotate(0deg) scale(1);}
-  100% { transform: translateY(800px) rotate(360deg) scale(1.5);}
+  0% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(800px) rotate(360deg); }
 }
 </style>
 </head>
+
 <body>
 
-<div class="container" id="content">
-  <h1 id="message"></h1>
+<div class="container" id="box">
+  <h1 id="text"></h1>
   <button id="nextBtn">Next</button>
 </div>
 
-<!-- Background music from GitHub -->
-<audio id="music" src="https://github.com/rumman436/love-website/blob/main/ScreenRecording_02-05-2026%2014-10-55_1.mp4?raw=true" loop></audio>
+<audio id="music" loop>
+  <source src="https://github.com/rumman436/love-website/raw/main/ScreenRecording_02-05-2026%2014-10-55_1.mp4" type="audio/mp4">
+</audio>
 
 <script>
-// -------------------- INTRO MESSAGES --------------------
-const introMessages = [
+const messages = [
   "Heyy",
   "I need to ask you a really important question",
   "But are you really Wareesha?",
@@ -99,149 +99,127 @@ const introMessages = [
   "Just kidding 😂"
 ];
 
-let stepIndex = 0;
+let index = 0;
 
-// Typing effect function
-function typeMessage(text, callback) {
-  const messageEl = document.getElementById("message");
-  messageEl.textContent = "";
+function typeText(text, callback) {
+  const el = document.getElementById("text");
+  el.innerHTML = "";
   let i = 0;
-  const speed = 50;
-
-  const interval = setInterval(() => {
-    messageEl.textContent += text[i];
+  const timer = setInterval(() => {
+    el.innerHTML += text[i];
     i++;
-    if(i >= text.length){
-      clearInterval(interval);
-      if(callback) callback();
+    if (i === text.length) {
+      clearInterval(timer);
+      if (callback) callback();
     }
-  }, speed);
+  }, 50);
 }
 
-// Show next message
-function nextMessage() {
-  if(stepIndex < introMessages.length){
-    typeMessage(introMessages[stepIndex], () => {
-      stepIndex++;
-      // After last message, pause 1s before main game
-      if(stepIndex >= introMessages.length){
-        setTimeout(showMainGame, 1000); // 1-second delay
-        document.getElementById("nextBtn").style.display = "none";
-      }
-    });
-  }
-}
+typeText(messages[index]);
+index++;
 
-// Initialize first message
-typeMessage(introMessages[0]);
-stepIndex++;
-
-// -------------------- Swipe gestures --------------------
-let touchStartX = 0;
-let touchEndX = 0;
-
-document.addEventListener('touchstart', e => {
-  touchStartX = e.changedTouches[0].screenX;
-}, false);
-
-document.addEventListener('touchend', e => {
-  touchEndX = e.changedTouches[0].screenX;
-  if(touchEndX < touchStartX - 50 || touchEndX > touchStartX + 50) {
-    nextMessage();
-  }
-}, false);
-
-// -------------------- MAIN GAME --------------------
-function showMainGame() {
-  const content = document.getElementById("content");
-  content.innerHTML = `
-    <h1>Do you love me? ❤️</h1>
-    <button id="yes" onclick="yesClick()">Yes</button>
-    <button id="no" onmouseenter="scaredNo()">No</button>
-  `;
-}
-
-let firstYesClick = true;
-
-// -------------------- NO BUTTON --------------------
-function scaredNo() {
-  const noBtn = document.getElementById("no");
-  const btnWidth = noBtn.offsetWidth;
-  const btnHeight = noBtn.offsetHeight;
-  const margin = 20; // stay fully visible
-  const maxX = window.innerWidth - btnWidth - margin; 
-  const maxY = window.innerHeight - btnHeight - margin;
-
-  const newX = Math.random() * maxX;
-  const newY = Math.random() * maxY;
-
-  noBtn.style.left = newX + "px";
-  noBtn.style.top = newY + "px";
-
-  // iPhone vibration
-  if (navigator.vibrate) navigator.vibrate(100);
-
-  noBtn.style.transform = `rotate(${Math.random()*30-15}deg) scale(1.2)`;
-  setTimeout(() => { 
-    noBtn.style.transform = "rotate(0deg) scale(1)"; 
-  }, 200);
-}
-
-// -------------------- YES BUTTON --------------------
-function yesClick() {
-  document.getElementById("music").play(); // play song
-  enableRomanticMode(); // change background gradient
-  if(firstYesClick) {
-    firstYesClick = false;
-    if(confirm("ARE YOU SURE?")) {
-      showLove();
-    }
+document.getElementById("nextBtn").onclick = () => {
+  if (index < messages.length) {
+    typeText(messages[index]);
+    index++;
   } else {
-    showLove();
+    showLoveQuestion();
   }
+};
+
+function showLoveQuestion() {
+  const box = document.getElementById("box");
+  box.innerHTML = `
+    <h1>Do you love me? ❤️</h1>
+    <button id="yes">Yes</button>
+    <button id="no">No</button>
+  `;
+
+  const noBtn = document.getElementById("no");
+  noBtn.style.left = "50%";
+  noBtn.style.top = "65%";
+  noBtn.style.transform = "translateX(-50%)";
+
+  noBtn.onmouseenter = scareNo;
+  noBtn.onclick = scareNo;
+
+  document.getElementById("yes").onclick = yesClicked;
 }
 
-// -------------------- ROMANTIC MODE --------------------
-function enableRomanticMode() {
+function scareNo() {
+  const no = document.getElementById("no");
+  const maxX = window.innerWidth - 100;
+  const maxY = window.innerHeight - 100;
+
+  no.style.left = Math.random() * maxX + "px";
+  no.style.top = Math.random() * maxY + "px";
+
+  if (navigator.vibrate) navigator.vibrate(100);
+}
+
+function yesClicked() {
+  document.getElementById("music").play().catch(()=>{});
+
+  const sure = confirm("ARE YOU SURE?");
+  if (!sure) {
+    showSecondThoughts();
+    return;
+  }
+
+  romanticMode();
+  showIKnewIt();
+}
+
+function showSecondThoughts() {
+  const box = document.getElementById("box");
+  box.innerHTML = `
+    <h1>Having second thoughts? Huh? 😏</h1>
+    <button id="nextBtn">Next</button>
+  `;
+
+  document.getElementById("nextBtn").onclick = showLoveQuestion;
+}
+
+function romanticMode() {
   const colors = [
-    'linear-gradient(135deg, #ff9a9e, #fad0c4)',
-    'linear-gradient(135deg, #ffb347, #ffcc33)',
-    'linear-gradient(135deg, #ff758c, #ff7eb3)',
-    'linear-gradient(135deg, #ffafbd, #ffc3a0)'
+    'linear-gradient(135deg,#ff758c,#ff7eb3)',
+    'linear-gradient(135deg,#ff9a9e,#fad0c4)',
+    'linear-gradient(135deg,#ffc3a0,#ffafbd)'
   ];
   let i = 0;
   setInterval(() => {
-    document.body.style.background = colors[i];
-    i = (i + 1) % colors.length;
-  }, 1000);
+    document.body.style.background = colors[i % colors.length];
+    i++;
+  }, 1200);
 }
 
-// -------------------- SHOW LOVE --------------------
-function showLove() {
-  const content = document.getElementById("content");
-  content.innerHTML = `
-    <h1 class="love">I knew it 🥰❤️</h1>
+function showIKnewIt() {
+  const box = document.getElementById("box");
+  box.innerHTML = `
+    <h1>I knew it 🥰</h1>
+    <button id="nextBtn">Next</button>
   `;
 
-  for(let i=0; i<50; i++){
-    createHearts();
+  heartBurst();
+
+  document.getElementById("nextBtn").onclick = showLoveToo;
+}
+
+function showLoveToo() {
+  const box = document.getElementById("box");
+  box.innerHTML = `<h1>I Love You toooo ❤️</h1>`;
+}
+
+function heartBurst() {
+  for (let i = 0; i < 20; i++) {
+    const h = document.createElement("div");
+    h.className = "heart";
+    h.innerHTML = "❤️";
+    h.style.left = Math.random() * window.innerWidth + "px";
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 3000);
   }
 }
-
-// -------------------- CREATE FALLING HEARTS --------------------
-function createHearts() {
-  const heart = document.createElement("div");
-  heart.classList.add("heart");
-  heart.textContent = "❤️";
-  heart.style.left = Math.random() * window.innerWidth + "px";
-  heart.style.fontSize = (15 + Math.random()*25) + "px";
-  document.body.appendChild(heart);
-
-  setTimeout(() => { heart.remove(); }, 3000);
-}
-
-// -------------------- NEXT BUTTON CLICK --------------------
-document.getElementById("nextBtn").addEventListener("click", nextMessage);
 </script>
 
 </body>
