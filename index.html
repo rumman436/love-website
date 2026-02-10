@@ -29,6 +29,9 @@ h1 {
 p {
   font-size: 18px;
   line-height: 1.6;
+  opacity: 0;
+  transition: opacity 1s;
+  margin: 5px 0;
 }
 
 button {
@@ -82,8 +85,7 @@ const steps = [
 ];
 
 let stepIndex = 0;
-let stage = "normal"; 
-// normal → knew → love → paragraph
+let stage = "normal"; // normal → knew → love → paragraph
 
 const content = document.getElementById("content");
 const nextBtn = document.getElementById("nextBtn");
@@ -117,8 +119,34 @@ function showStep() {
   });
 }
 
-nextBtn.onclick = () => {
+function showParagraphFade() {
+  const paragraphLines = [
+    "Not gonna ask you to be my Valentine…",
+    "because you’re already mine 😌",
+    "I wanna be the guy who wakes up with you every morning,",
+    "sleeps next to you every night,",
+    "watches movies with you,",
+    "watch you eat your lunch like it’s my favorite show,",
+    "and unlimited access to your drama 💝"
+  ];
 
+  content.innerHTML = ""; // clear previous content
+  paragraphLines.forEach(line => {
+    const p = document.createElement("p");
+    p.textContent = line;
+    content.appendChild(p);
+  });
+
+  const ps = content.querySelectorAll("p");
+  let index = 0;
+  const fadeInterval = setInterval(() => {
+    ps[index].style.opacity = 1;
+    index++;
+    if (index >= ps.length) clearInterval(fadeInterval);
+  }, 600); // 600ms between lines
+}
+
+nextBtn.onclick = () => {
   if (stage === "knew") {
     typeText("I Love You toooo ❤️");
     stage = "love";
@@ -126,18 +154,7 @@ nextBtn.onclick = () => {
   }
 
   if (stage === "love") {
-    content.innerHTML = `
-      <p>
-        Not gonna ask you to be my Valentine…<br>
-        because you’re already mine 😌<br>
-        I wanna be the guy who wakes up with you every morning,<br>
-        sleeps next to you every night,<br>
-        watches movies with you,<br>
-        watch you eat your lunch like it’s my favorite show,<br>
-        and unlimited access to your drama 💝
-      </p>
-    `;
-    nextBtn.style.display = "none";
+    showParagraphFade();
     stage = "paragraph";
     return;
   }
