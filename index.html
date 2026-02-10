@@ -36,9 +36,21 @@ button {
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  margin: 10px;
+}
+
+#next {
   background: #222;
   color: white;
-  margin-top: 20px;
+}
+
+#yes {
+  background: #ff4d6d;
+  color: white;
+}
+
+#no {
+  background: #adb5bd;
 }
 </style>
 </head>
@@ -47,6 +59,12 @@ button {
 
 <div class="container">
   <div id="text"></div>
+
+  <div id="choices" style="display:none;">
+    <button id="yes">Yes</button>
+    <button id="no">No</button>
+  </div>
+
   <button id="next">Next</button>
 </div>
 
@@ -65,18 +83,18 @@ const messages = [
 
 let index = 0;
 let typing = false;
+let atQuestion = false;
 
 const text = document.getElementById("text");
 const nextBtn = document.getElementById("next");
+const choices = document.getElementById("choices");
 
 function typeText(message) {
   typing = true;
   text.innerHTML = "";
   let i = 0;
-
   const interval = setInterval(() => {
-    text.innerHTML += message[i];
-    i++;
+    text.innerHTML += message[i++];
     if (i === message.length) {
       clearInterval(interval);
       typing = false;
@@ -89,11 +107,30 @@ nextBtn.onclick = () => {
 
   if (index < messages.length) {
     typeText(messages[index]);
+
+    if (messages[index] === "Do you love me? ❤️") {
+      atQuestion = true;
+      choices.style.display = "block";
+      nextBtn.style.display = "none";
+    }
+
     index++;
   }
 };
 
-// start first message
+document.getElementById("yes").onclick = () => {
+  choices.style.display = "none";
+  nextBtn.style.display = "none";
+  typeText("I Love You toooo ❤️");
+};
+
+document.getElementById("no").onclick = () => {
+  choices.style.display = "none";
+  nextBtn.style.display = "none";
+  typeText("Okay… I’ll wait 🙂");
+};
+
+// start
 typeText(messages[index]);
 index++;
 </script>
