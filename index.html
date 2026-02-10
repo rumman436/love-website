@@ -83,7 +83,7 @@ const messages = [
 
 let index = 0;
 let typing = false;
-let atQuestion = false;
+let stage = "intro"; // intro | yes1 | yes2
 
 const text = document.getElementById("text");
 const nextBtn = document.getElementById("next");
@@ -105,23 +105,34 @@ function typeText(message) {
 nextBtn.onclick = () => {
   if (typing) return;
 
-  if (index < messages.length) {
-    typeText(messages[index]);
+  // INTRO FLOW
+  if (stage === "intro") {
+    if (index < messages.length) {
+      typeText(messages[index]);
 
-    if (messages[index] === "Do you love me? ❤️") {
-      atQuestion = true;
-      choices.style.display = "block";
-      nextBtn.style.display = "none";
+      // when we reach the question
+      if (messages[index] === "Do you love me? ❤️") {
+        choices.style.display = "block";
+        nextBtn.style.display = "none";
+      }
+
+      index++;
     }
+  }
 
-    index++;
+  // AFTER "I knew it"
+  else if (stage === "yes1") {
+    typeText("I Love You toooo ❤️");
+    nextBtn.style.display = "none";
+    stage = "done";
   }
 };
 
 document.getElementById("yes").onclick = () => {
   choices.style.display = "none";
-  nextBtn.style.display = "none";
-  typeText("I Love You toooo ❤️");
+  nextBtn.style.display = "block";
+  typeText("I knew it 🥰");
+  stage = "yes1";
 };
 
 document.getElementById("no").onclick = () => {
@@ -130,7 +141,7 @@ document.getElementById("no").onclick = () => {
   typeText("Okay… I’ll wait 🙂");
 };
 
-// start
+// START
 typeText(messages[index]);
 index++;
 </script>
