@@ -219,9 +219,9 @@ noBtn.onclick = () => {
   if (scale <= 0.2) noBtn.style.display = "none";
 
   // Show second thoughts message
-  choices.style.display = "none";
-  nextBtn.style.display = "inline-block";
-  backBtn.style.display = "inline-block";
+  choices.style.display = "none"; // <-- HIDE YES/NO completely
+  nextBtn.style.display = "none"; // hide next
+  backBtn.style.display = "inline-block"; // show only back
   stage = "secondThoughts";
   typeText("Having second thoughts? Huh?");
 };
