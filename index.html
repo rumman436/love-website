@@ -43,6 +43,7 @@ button {
   background: #ff4d6d;
   color: white;
   cursor: pointer;
+  transition: transform 0.3s;
 }
 
 .choices {
@@ -54,6 +55,18 @@ button {
 
 .choices button {
   background: #ff758f;
+}
+
+/* ===== YES BUTTON HEARTBEAT ===== */
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.1); }
+  50% { transform: scale(1); }
+  75% { transform: scale(1.1); }
+}
+
+.heartbeat {
+  animation: heartbeat 1s infinite;
 }
 </style>
 </head>
@@ -115,6 +128,7 @@ function showStep() {
     if (steps[stepIndex] === "Do you love me?") {
       nextBtn.style.display = "none";
       choices.style.display = "flex";
+      yesBtn.classList.add("heartbeat"); // Start heartbeat effect
     }
   });
 }
