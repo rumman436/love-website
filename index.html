@@ -15,6 +15,7 @@ body {
   align-items: center;
   height: 100vh;
   text-align: center;
+  transition: background 2s ease;
 }
 
 .box {
@@ -129,8 +130,8 @@ function showStep() {
     if (steps[stepIndex] === "Do you love me?") {
       nextBtn.style.display = "none";
       choices.style.display = "flex";
-      yesBtn.classList.add("heartbeat"); // Yes button heartbeat
-      noBtn.style.transform = "scale(1)"; // Reset No size
+      yesBtn.classList.add("heartbeat");
+      noBtn.style.transform = "scale(1)";
       noClickCount = 0;
     }
   });
@@ -147,7 +148,7 @@ function showParagraphFade() {
     "and unlimited access to your drama 💝"
   ];
 
-  content.innerHTML = ""; // clear previous content
+  content.innerHTML = "";
   paragraphLines.forEach(line => {
     const p = document.createElement("p");
     p.textContent = line;
@@ -187,17 +188,20 @@ yesBtn.onclick = () => {
   nextBtn.style.display = "inline-block";
   stage = "knew";
   typeText("I knew it 🥰");
+
+  // ===== YES BUTTON GROWS =====
+  yesBtn.style.transition = "transform 0.5s";
+  yesBtn.style.transform = "scale(1.5)";
+
+  // ===== BACKGROUND GRADIENT ROMANTIC MODE =====
+  document.body.style.background = "linear-gradient(135deg, #ff9fc3, #ffe0e9)";
 };
 
 noBtn.onclick = () => {
-  // Shrink every click
   noClickCount++;
-  const scale = Math.max(0.2, 1 - 0.15 * noClickCount); // shrink 15% each click
-  noBtn.style.transform = `scale(${scale})`;
-
-  if (scale <= 0.2) {
-    noBtn.style.display = "none"; // vanish after small enough
-  }
+  const scale = Math.max(0.2, 1 - 0.15 * noClickCount);
+  noBtn.style.transform = `scale(${scale}`;
+  if (scale <= 0.2) noBtn.style.display = "none";
 
   typeText("Having second thoughts? Huh?");
 };
