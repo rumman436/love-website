@@ -63,13 +63,7 @@ button {
   </div>
 </div>
 
-<!-- 🔊 MUSIC (MP3 ONLY) -->
-<audio id="music" loop>
-  <source src="https://raw.githubusercontent.com/rumman436/love-website/main/love.mp3" type="audio/mpeg">
-</audio>
-
 <script>
-/* ===== STEPS ===== */
 const steps = [
   "Heyy",
   "I need to ask you a really important question",
@@ -90,9 +84,7 @@ const nextBtn = document.getElementById("nextBtn");
 const choices = document.getElementById("choices");
 const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
-const music = document.getElementById("music");
 
-/* ===== TYPING EFFECT ===== */
 function typeText(text, callback) {
   textEl.textContent = "";
   let i = 0;
@@ -106,7 +98,6 @@ function typeText(text, callback) {
   }, 40);
 }
 
-/* ===== SHOW STEP ===== */
 function showStep() {
   choices.style.display = "none";
   nextBtn.style.display = "inline-block";
@@ -119,7 +110,6 @@ function showStep() {
   });
 }
 
-/* ===== NEXT BUTTON ===== */
 nextBtn.onclick = () => {
   if (yesStage === 1) {
     typeText("I Love You toooo ❤️");
@@ -134,26 +124,19 @@ nextBtn.onclick = () => {
   }
 };
 
-/* ===== YES ===== */
 yesBtn.onclick = () => {
   choices.style.display = "none";
   nextBtn.style.display = "inline-block";
   yesStage = 1;
-
-  // 🔊 MUST be triggered by tap (iPhone rule)
-  music.play().catch(() => {});
-
   typeText("I knew it 🥰");
 };
 
-/* ===== NO ===== */
 noBtn.onclick = () => {
   choices.style.display = "none";
   nextBtn.style.display = "inline-block";
   typeText("Having second thoughts? Huh?");
 };
 
-/* ===== START ===== */
 showStep();
 </script>
 
