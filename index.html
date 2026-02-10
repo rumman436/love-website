@@ -28,7 +28,7 @@ h1 {
 
 p {
   font-size: 18px;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 button {
@@ -82,8 +82,8 @@ const steps = [
 ];
 
 let stepIndex = 0;
-let yesStage = 0;
-let showParagraph = false;
+let stage = "normal"; 
+// normal → knew → love → paragraph
 
 const content = document.getElementById("content");
 const nextBtn = document.getElementById("nextBtn");
@@ -108,6 +108,7 @@ function typeText(text, callback) {
 function showStep() {
   choices.style.display = "none";
   nextBtn.style.display = "inline-block";
+
   typeText(steps[stepIndex], () => {
     if (steps[stepIndex] === "Do you love me?") {
       nextBtn.style.display = "none";
@@ -118,18 +119,17 @@ function showStep() {
 
 nextBtn.onclick = () => {
 
-  if (yesStage === 1) {
+  if (stage === "knew") {
     typeText("I Love You toooo ❤️");
-    yesStage = 2;
+    stage = "love";
     return;
   }
 
-  if (yesStage === 2 && !showParagraph) {
+  if (stage === "love") {
     content.innerHTML = `
       <p>
         Not gonna ask you to be my Valentine…<br>
-        because you’re already mine 😌<br><br>
-
+        because you’re already mine 😌<br>
         I wanna be the guy who wakes up with you every morning,<br>
         sleeps next to you every night,<br>
         watches movies with you,<br>
@@ -137,8 +137,8 @@ nextBtn.onclick = () => {
         and unlimited access to your drama 💝
       </p>
     `;
-    showParagraph = true;
     nextBtn.style.display = "none";
+    stage = "paragraph";
     return;
   }
 
@@ -151,7 +151,7 @@ nextBtn.onclick = () => {
 yesBtn.onclick = () => {
   choices.style.display = "none";
   nextBtn.style.display = "inline-block";
-  yesStage = 1;
+  stage = "knew";
   typeText("I knew it 🥰");
 };
 
