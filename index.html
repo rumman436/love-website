@@ -1,150 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Love Website</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Heyy ❤️</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body {
-  margin: 0;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-}
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #fff0f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
 
-.container {
-  background: white;
-  padding: 30px;
-  border-radius: 16px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-  text-align: center;
-  max-width: 90%;
-}
+    .box {
+      max-width: 90%;
+    }
 
-#text {
-  font-size: 22px;
-  min-height: 90px;
-}
+    h1 {
+      font-size: 24px;
+      min-height: 60px;
+    }
 
-button {
-  padding: 12px 24px;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  margin: 10px;
-}
+    button {
+      margin-top: 20px;
+      padding: 12px 22px;
+      font-size: 16px;
+      border: none;
+      border-radius: 20px;
+      background: #ff4d6d;
+      color: white;
+      cursor: pointer;
+    }
 
-#next {
-  background: #222;
-  color: white;
-}
+    .choices {
+      display: none;
+      margin-top: 20px;
+      gap: 20px;
+      justify-content: center;
+    }
 
-#yes {
-  background: #ff4d6d;
-  color: white;
-}
-
-#no {
-  background: #adb5bd;
-}
-</style>
+    .choices button {
+      background: #ff758f;
+    }
+  </style>
 </head>
-
 <body>
 
-<div class="container">
-  <div id="text"></div>
+  <div class="box">
+    <h1 id="text"></h1>
 
-  <div id="choices" style="display:none;">
-    <button id="yes">Yes</button>
-    <button id="no">No</button>
+    <button id="nextBtn">Next</button>
+
+    <div class="choices" id="choices">
+      <button onclick="yesClicked()">Yes ❤️</button>
+      <button onclick="noClicked()">No 🙃</button>
+    </div>
   </div>
 
-  <button id="next">Next</button>
-</div>
+  <script>
+    const steps = [
+      "Heyy",
+      "I need to ask you a really important question",
+      "But are you really Wareesha?",
+      "Wareesha Naeem?",
+      "Smile if you are Wareesha",
+      "Good 😌",
+      "Dance if you’re my Wareesha",
+      "Just kidding 😂",
+      "Do you love me?"
+    ];
 
-<script>
-const messages = [
-  "Heyy",
-  "I need to ask you a really important question",
-  "But are you really Wareesha?",
-  "Wareesha Naeem?",
-  "Smile if you are Wareesha",
-  "Good",
-  "Dance if you are my Wareesha",
-  "Just kidding 😂",
-  "Do you love me? ❤️"
-];
+    let stepIndex = 0;
+    const textEl = document.getElementById("text");
+    const nextBtn = document.getElementById("nextBtn");
+    const choices = document.getElementById("choices");
 
-let index = 0;
-let typing = false;
-let stage = "intro"; // intro | yes1 | yes2
-
-const text = document.getElementById("text");
-const nextBtn = document.getElementById("next");
-const choices = document.getElementById("choices");
-
-function typeText(message) {
-  typing = true;
-  text.innerHTML = "";
-  let i = 0;
-  const interval = setInterval(() => {
-    text.innerHTML += message[i++];
-    if (i === message.length) {
-      clearInterval(interval);
-      typing = false;
+    function typeText(text) {
+      textEl.textContent = "";
+      let i = 0;
+      const interval = setInterval(() => {
+        textEl.textContent += text[i];
+        i++;
+        if (i >= text.length) clearInterval(interval);
+      }, 40);
     }
-  }, 45);
-}
 
-nextBtn.onclick = () => {
-  if (typing) return;
+    function showStep() {
+      choices.style.display = "none";
+      nextBtn.style.display = "inline-block";
 
-  // INTRO FLOW
-  if (stage === "intro") {
-    if (index < messages.length) {
-      typeText(messages[index]);
+      typeText(steps[stepIndex]);
 
-      // when we reach the question
-      if (messages[index] === "Do you love me? ❤️") {
-        choices.style.display = "block";
+      if (steps[stepIndex] === "Do you love me?") {
         nextBtn.style.display = "none";
+        setTimeout(() => {
+          choices.style.display = "flex";
+        }, 600);
       }
-
-      index++;
     }
-  }
 
-  // AFTER "I knew it"
-  else if (stage === "yes1") {
-    typeText("I Love You toooo ❤️");
-    nextBtn.style.display = "none";
-    stage = "done";
-  }
-};
+    nextBtn.onclick = () => {
+      if (stepIndex < steps.length - 1) {
+        stepIndex++;
+        showStep();
+      }
+    };
 
-document.getElementById("yes").onclick = () => {
-  choices.style.display = "none";
-  nextBtn.style.display = "block";
-  typeText("I knew it 🥰");
-  stage = "yes1";
-};
+    function yesClicked() {
+      alert("I knew it ❤️");
+    }
 
-document.getElementById("no").onclick = () => {
-  choices.style.display = "none";
-  nextBtn.style.display = "none";
-  typeText("Okay… I’ll wait 🙂");
-};
+    function noClicked() {
+      alert("Liar 😏");
+    }
 
-// START
-typeText(messages[index]);
-index++;
-</script>
+    // start
+    showStep();
+  </script>
 
 </body>
 </html>
