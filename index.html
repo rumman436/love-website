@@ -26,6 +26,11 @@ h1 {
   min-height: 70px;
 }
 
+p {
+  font-size: 18px;
+  line-height: 1.5;
+}
+
 button {
   margin-top: 20px;
   padding: 12px 24px;
@@ -53,7 +58,7 @@ button {
 <body>
 
 <div class="box">
-  <h1 id="text"></h1>
+  <div id="content"></div>
 
   <button id="nextBtn">Next</button>
 
@@ -78,18 +83,20 @@ const steps = [
 
 let stepIndex = 0;
 let yesStage = 0;
+let showParagraph = false;
 
-const textEl = document.getElementById("text");
+const content = document.getElementById("content");
 const nextBtn = document.getElementById("nextBtn");
 const choices = document.getElementById("choices");
 const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
 
 function typeText(text, callback) {
-  textEl.textContent = "";
+  content.innerHTML = "<h1></h1>";
+  const h1 = content.querySelector("h1");
   let i = 0;
   const interval = setInterval(() => {
-    textEl.textContent += text[i];
+    h1.textContent += text[i];
     i++;
     if (i >= text.length) {
       clearInterval(interval);
@@ -101,7 +108,6 @@ function typeText(text, callback) {
 function showStep() {
   choices.style.display = "none";
   nextBtn.style.display = "inline-block";
-
   typeText(steps[stepIndex], () => {
     if (steps[stepIndex] === "Do you love me?") {
       nextBtn.style.display = "none";
@@ -111,9 +117,27 @@ function showStep() {
 }
 
 nextBtn.onclick = () => {
+
   if (yesStage === 1) {
     typeText("I Love You toooo ❤️");
     yesStage = 2;
+    return;
+  }
+
+  if (yesStage === 2 && !showParagraph) {
+    content.innerHTML = `
+      <p>
+        Not gonna ask you to be my Valentine…<br>
+        because you’re already mine 😌<br><br>
+
+        I wanna be the guy who wakes up with you every morning,<br>
+        sleeps next to you every night,<br>
+        watches movies with you,<br>
+        watch you eat your lunch like it’s my favorite show,<br>
+        and unlimited access to your drama 💝
+      </p>
+    `;
+    showParagraph = true;
     nextBtn.style.display = "none";
     return;
   }
