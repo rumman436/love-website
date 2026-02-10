@@ -99,6 +99,7 @@ const steps = [
 
 let stepIndex = 0;
 let stage = "normal"; // normal → knew → love → paragraph
+let noClickCount = 0;
 
 const content = document.getElementById("content");
 const nextBtn = document.getElementById("nextBtn");
@@ -128,7 +129,9 @@ function showStep() {
     if (steps[stepIndex] === "Do you love me?") {
       nextBtn.style.display = "none";
       choices.style.display = "flex";
-      yesBtn.classList.add("heartbeat"); // apply heartbeat **when visible**
+      yesBtn.classList.add("heartbeat"); // Yes button heartbeat
+      noBtn.style.transform = "scale(1)"; // Reset No size
+      noClickCount = 0;
     }
   });
 }
@@ -157,7 +160,7 @@ function showParagraphFade() {
     ps[index].style.opacity = 1;
     index++;
     if (index >= ps.length) clearInterval(fadeInterval);
-  }, 600); // 600ms between lines
+  }, 600);
 }
 
 nextBtn.onclick = () => {
@@ -187,8 +190,15 @@ yesBtn.onclick = () => {
 };
 
 noBtn.onclick = () => {
-  choices.style.display = "none";
-  nextBtn.style.display = "inline-block";
+  // Shrink every click
+  noClickCount++;
+  const scale = Math.max(0.2, 1 - 0.15 * noClickCount); // shrink 15% each click
+  noBtn.style.transform = `scale(${scale})`;
+
+  if (scale <= 0.2) {
+    noBtn.style.display = "none"; // vanish after small enough
+  }
+
   typeText("Having second thoughts? Huh?");
 };
 
