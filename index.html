@@ -15,7 +15,6 @@ body {
   align-items: center;
   height: 100vh;
   text-align: center;
-  transition: background 2s ease;
 }
 
 .box {
@@ -27,53 +26,21 @@ h1 {
   min-height: 70px;
 }
 
-p {
-  font-size: 18px;
-  line-height: 1.6;
-  opacity: 0;
-  transition: opacity 1s;
-  margin: 5px 0;
-}
-
 button {
-  margin-top: 20px;
-  padding: 12px 24px;
+  margin: 15px;
+  padding: 14px 28px;
   font-size: 16px;
   border: none;
-  border-radius: 20px;
+  border-radius: 25px;
   background: #ff4d6d;
   color: white;
   cursor: pointer;
-  transition: transform 0.3s;
+  transition: transform 0.3s ease;
 }
 
 .choices {
   display: none;
   margin-top: 20px;
-  gap: 20px;
-  justify-content: center;
-}
-
-.choices button {
-  background: #ff758f;
-}
-
-/* ===== YES BUTTON HEARTBEAT ===== */
-@keyframes heartbeat {
-  0%, 100% { transform: scale(1); }
-  25% { transform: scale(1.1); }
-  50% { transform: scale(1); }
-  75% { transform: scale(1.1); }
-}
-
-.heartbeat {
-  animation: heartbeat 1s infinite;
-}
-
-#backBtn {
-  display: none;
-  margin-right: 10px;
-  background: #ff758f;
 }
 </style>
 </head>
@@ -83,7 +50,6 @@ button {
 <div class="box">
   <div id="content"></div>
 
-  <button id="backBtn">Back</button>
   <button id="nextBtn">Next</button>
 
   <div class="choices" id="choices">
@@ -106,12 +72,11 @@ const steps = [
 ];
 
 let stepIndex = 0;
-let stage = "normal"; // normal → knew → love → paragraph
-let noClickCount = 0;
+let yesScale = 1;
+let noScale = 1;
 
 const content = document.getElementById("content");
 const nextBtn = document.getElementById("nextBtn");
-const backBtn = document.getElementById("backBtn");
 const choices = document.getElementById("choices");
 const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
@@ -133,97 +98,34 @@ function typeText(text, callback) {
 function showStep() {
   choices.style.display = "none";
   nextBtn.style.display = "inline-block";
-  backBtn.style.display = "none";
 
   typeText(steps[stepIndex], () => {
     if (steps[stepIndex] === "Do you love me?") {
       nextBtn.style.display = "none";
-      choices.style.display = "flex";
-      yesBtn.classList.add("heartbeat");
-      noBtn.style.transform = "scale(1)";
-      noClickCount = 0;
+      choices.style.display = "block";
     }
   });
 }
 
-function showParagraphFade() {
-  const paragraphLines = [
-    "Not gonna ask you to be my Valentine…",
-    "because you’re already mine 😌",
-    "I wanna be the guy who wakes up with you every morning,",
-    "sleeps next to you every night,",
-    "watches movies with you,",
-    "watch you eat your lunch like it’s my favorite show,",
-    "and unlimited access to your drama 💝"
-  ];
-
-  content.innerHTML = "";
-  paragraphLines.forEach(line => {
-    const p = document.createElement("p");
-    p.textContent = line;
-    content.appendChild(p);
-  });
-
-  const ps = content.querySelectorAll("p");
-  let index = 0;
-  const fadeInterval = setInterval(() => {
-    ps[index].style.opacity = 1;
-    index++;
-    if (index >= ps.length) clearInterval(fadeInterval);
-  }, 600);
-}
-
 nextBtn.onclick = () => {
-  if (stage === "knew") {
-    typeText("I Love You toooo ❤️");
-    stage = "love";
-    return;
-  }
-
-  if (stage === "love") {
-    showParagraphFade();
-    stage = "paragraph";
-    return;
-  }
-
   if (stepIndex < steps.length - 1) {
     stepIndex++;
     showStep();
   }
 };
 
-backBtn.onclick = () => {
-  // Go back to previous step
-  if (stage === "secondThoughts") {
-    stage = "normal";
-    showStep();
-  }
-};
-
 yesBtn.onclick = () => {
-  choices.style.display = "none";
-  nextBtn.style.display = "inline-block";
-  stage = "knew";
-  typeText("I knew it 🥰");
+  yesScale += 0.15;
+  yesBtn.style.transform = `scale(${yesScale})`;
 
-  yesBtn.style.transition = "transform 0.5s";
-  yesBtn.style.transform = "scale(1.5)";
-  document.body.style.background = "linear-gradient(135deg, #ff9fc3, #ffe0e9)";
+  content.innerHTML = "<h1>I Love You toooo ❤️</h1>";
+  choices.style.display = "none";
 };
 
 noBtn.onclick = () => {
-  // Shrink No button
-  noClickCount++;
-  const scale = Math.max(0.2, 1 - 0.15 * noClickCount);
-  noBtn.style.transform = `scale(${scale})`;
-  if (scale <= 0.2) noBtn.style.display = "none";
-
-  // Show second thoughts message
-  choices.style.display = "none"; // <-- HIDE YES/NO completely
-  nextBtn.style.display = "none"; // hide next
-  backBtn.style.display = "inline-block"; // show only back
-  stage = "secondThoughts";
-  typeText("Having second thoughts? Huh?");
+  noScale -= 0.15;
+  if (noScale < 0.3) noScale = 0.3;
+  noBtn.style.transform = `scale(${noScale})`;
 };
 
 showStep();
